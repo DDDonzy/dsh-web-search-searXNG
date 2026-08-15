@@ -20,24 +20,34 @@ This is an **implementation** package: it registers a provider into `ctx.web`, r
 
 ## Install
 
-Register the plugin into your profile (from the profile directory or via the dsh CLI):
+### One-command install (bundle)
+
+The package ships a `dsh.bundle.patch` declaration (`cordis.patch.yml`), so a
+single `dsh plugin add` registers the plugin **and** switches the web seam to
+it — no YAML editing:
 
 ```bash
-# 0. One-shot publish helper (requires `gh auth login` first):
-#    creates the GitHub repo, adds the dsh-plugin topic, pushes, and
-#    updates package.json's repository field.
-bash publish-to-github.sh
+dsh plugin --profile web add /path/to/dsh-web-search-searxng
+```
 
+Configuration is environment-first — set these before launching `dsh` and no
+config editing is required at all:
+
+```bash
+export SEARXNG_BASE_URL=http://localhost:8080   # optional; default http://localhost:8080
+export SEARXNG_MAX_RESULTS=10                    # optional; default 10
+export SEARXNG_LANGUAGE=en                       # optional; 'all' (no param) by default
+```
+
+### Manual install (local development)
+
+```bash
 # 1. Make the package resolvable from the profile's node_modules
-#    (symlink works for local development; publish to npm for distribution):
 ln -sfn /path/to/dsh-web-search-searxng \
         "$DSH_HOME/profiles/node_modules/@deepseek-ai/dsh-web-search-searxng"
 
 # 2. Register the plugin and switch the search provider in cordis.patch.yml:
-#    (see config below)
 ```
-
-Then edit `$DSH_HOME/profiles/<profile>/cordis.patch.yml`:
 
 ```yaml
 - insert:
@@ -56,12 +66,19 @@ Restart the DSH process (or the GUI) for the patch to take effect.
 
 > Web profiles disable HMR reload by design; after editing `cordis.patch.yml` a process restart is required.
 
+## Tests
+
+```bash
+node --test tests/provider.spec.js   # 17 tests, zero dependencies (node:test)
+```
+
 ## Config
 
 | Key | Default | Meaning |
 |---|---|---|
 | `baseURL` | `http://localhost:8080` | SearXNG base URL; `/search` is appended. Falls back to `$SEARXNG_BASE_URL` from any environment layer. An unparseable value makes the provider unavailable. |
 | `maxResults` | `10` | Upper bound on sources returned by one search (the seam also enforces its own bound). |
+| `language` | `all` | Search language sent as `language=...` (e.g. `en`, `zh-CN`). `'all'` (or unset) omits the parameter entirely. Falls back to `$SEARXNG_LANGUAGE`. |
 | `apiKey` | omitted | Literal SearXNG API key, when your instance requires one. Prefer `apiKeyEnv` so no secret enters configuration; a non-empty literal wins. |
 | `apiKeyEnv` | `SEARXNG_API_KEY` | Credential reference resolved per search through `ctx.credentials`, or from the process environment when that seam is absent. A missing value is fine for keyless local instances. |
 
@@ -71,6 +88,7 @@ Restart the DSH process (or the GUI) for the patch to take effect.
   config:
     baseURL: http://localhost:8080
     maxResults: 10
+    language: en
 ```
 
 The entry above is the base layer of the `web-search-searxng` Settings section: a user layer over it reaches the NEXT search, because the provider projects the section per call rather than capturing it at registration. `apiKey` carries `role('secret')`, so it never rides a `describe()` response in any layer.

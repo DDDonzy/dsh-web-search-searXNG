@@ -20,23 +20,32 @@
 
 ## 安装
 
-把插件注册进你的 profile：
+### 一键安装（bundle）
+
+本包声明了 `dsh.bundle.patch`（`cordis.patch.yml`），因此一条 `dsh plugin add`
+即可同时完成"注册插件 + 切换 web seam"，无需手动编辑任何 YAML：
 
 ```bash
-# 0. 一键发布辅助脚本（需先 gh auth login）：
-#    自动创建 GitHub 仓库、添加 dsh-plugin 标签、推送代码、
-#    并更新 package.json 的 repository 字段。
-bash publish-to-github.sh
+dsh plugin --profile web add /path/to/dsh-web-search-searxng
+```
 
+配置优先走环境变量——启动 `dsh` 前设置即可，完全不用改配置：
+
+```bash
+export SEARXNG_BASE_URL=http://localhost:8080   # 可选；默认 http://localhost:8080
+export SEARXNG_MAX_RESULTS=10                    # 可选；默认 10
+export SEARXNG_LANGUAGE=en                       # 可选；默认 'all'（不传该参数）
+```
+
+### 手动安装（本地开发）
+
+```bash
 # 1. 让包能从 profile 的 node_modules 解析
-#    （本地开发用符号链接；发布到 npm 后直接安装即可）：
 ln -sfn /path/to/dsh-web-search-searxng \
         "$DSH_HOME/profiles/node_modules/@deepseek-ai/dsh-web-search-searxng"
 
 # 2. 在 cordis.patch.yml 中注册插件并切换搜索 provider（见下方配置）
 ```
-
-然后编辑 `$DSH_HOME/profiles/<profile>/cordis.patch.yml`：
 
 ```yaml
 - insert:
@@ -55,12 +64,19 @@ ln -sfn /path/to/dsh-web-search-searxng \
 
 > web profile 默认禁用 HMR 重载；修改 `cordis.patch.yml` 后需要重启进程。
 
+## 测试
+
+```bash
+node --test tests/provider.spec.js   # 17 个测试，零依赖（node:test）
+```
+
 ## 配置
 
 | 键 | 默认值 | 含义 |
 |---|---|---|
 | `baseURL` | `http://localhost:8080` | SearXNG 基础地址；自动追加 `/search`。可从任意环境层的 `$SEARXNG_BASE_URL` 回退。无法解析时 provider 不可用。 |
 | `maxResults` | `10` | 单次搜索返回来源数量上限（seam 也会强制执行自己的上限）。 |
+| `language` | `all` | 搜索语言，作为 `language=...` 发送（如 `en`、`zh-CN`）。`'all'`（或未设置）时完全省略该参数。可从 `$SEARXNG_LANGUAGE` 回退。 |
 | `apiKey` | 省略 | 字面量 SearXNG API key（当实例需要时）。优先用 `apiKeyEnv`，避免密钥进入配置文件；非空字面量优先。 |
 | `apiKeyEnv` | `SEARXNG_API_KEY` | 每次搜索通过 `ctx.credentials` 解析的凭据引用，seam 缺失时从进程环境读取。本地无密钥实例缺省即可。 |
 

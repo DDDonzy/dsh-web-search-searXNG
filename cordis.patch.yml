@@ -1,0 +1,19 @@
+# Bundle layer for dsh-web-search-searxng. Applied after the base bundle's
+# layer when this package is added to a profile (see `dsh plugin --profile web
+# add`). This layer does BOTH activation steps so a fresh install needs nothing
+# else: it switches the web seam to this provider and mounts the plugin row.
+#
+# Configuration is environment-first: set $SEARXNG_BASE_URL / $SEARXNG_MAX_RESULTS
+# / $SEARXNG_LANGUAGE in your shell or an .env before launching `dsh`, and no
+# YAML editing is required. The values below are fallbacks when unset.
+- id: web
+  config:
+    searchProvider: searxng-local
+
+- insert:
+    - id: web-search-searxng
+      name: dsh-web-search-searxng
+      config:
+        baseURL: !!js process.env.SEARXNG_BASE_URL ?? 'http://localhost:8080'
+        maxResults: !!js Number(process.env.SEARXNG_MAX_RESULTS ?? 10)
+        language: !!js process.env.SEARXNG_LANGUAGE ?? 'all'
