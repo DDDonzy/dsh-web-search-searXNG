@@ -1,6 +1,6 @@
 /* UI-only toggle control. The host decides whether the staged value is accepted. */
 
-function ToggleField({ value, disabled, label, hint, onChange }) {
+function ToggleField({ value, disabled, label, onChange }) {
   return React.createElement(
     "div",
     { className: "dshSearxngToggleField" },
@@ -18,6 +18,5 @@ function ToggleField({ value, disabled, label, hint, onChange }) {
       React.createElement("span", { className: "dshSearxngToggleTrack", "aria-hidden": true }, React.createElement("span", { className: "dshSearxngToggleThumb" })),
 
     ),
-    React.createElement("p", { className: "dshSearxngHint" }, hint),
   );
 }

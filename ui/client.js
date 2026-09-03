@@ -9,6 +9,7 @@
 
 const React = require("react");
 const { createSnapshotStore } = require("@deepseek-ai/dsh-client-store");
+const { IconChevronDownOutline14 } = require("@deepseek-ai/dsh-client-ui-primitives");
 
 const name = "web-search-searxng-ui";
 // Cordis service names required by this browser half. Package-level client
@@ -24,7 +25,6 @@ const translations = {
     title: "SearXNG 搜索",
     description: "使用自托管 SearXNG 作为 DSH 的网页搜索提供方。",
     enabled: "启用 SearXNG",
-    enabledHint: "关闭时使用 DSH 自带搜索；\n打开并保存后使用 SearXNG。",
     apiKey: "API Key",
     apiKeyHint: "写入后仅显示配置状态，不会回显密钥。留空并保存不会修改现有密钥。",
     apiKeySet: "已配置",
@@ -58,7 +58,6 @@ const translations = {
     title: "SearXNG search",
     description: "Use your self-hosted SearXNG instance as dsh's web-search provider.",
     enabled: "Enable SearXNG",
-    enabledHint: "Off uses dsh's built-in search;\nturn it on and save to use SearXNG.",
     apiKey: "API Key",
     apiKeyHint: "Only the configured state is shown. Leaving it blank preserves the current key.",
     apiKeySet: "Configured",
@@ -437,19 +436,23 @@ function TestControl({ state, disabled, onTest, t }) {
     { className: "dshSearxngTest" },
     React.createElement(
       "div",
-      { className: "dshSearxngTestActions" },
+      { className: "dshSearxngTestRow" },
+      message ? React.createElement("p", { className: messageClass, role: "status" }, message) : React.createElement("span", { className: "dshSearxngTestPlaceholder" }),
       React.createElement(
-        "button",
-        {
-          className: "dshSearxngButton",
-          type: "button",
-          disabled,
-          onClick: onTest,
-        },
-        state.kind === "testing" ? t("testing") : t("test"),
+        "div",
+        { className: "dshSearxngTestActions" },
+        React.createElement(
+          "button",
+          {
+            className: "dshSearxngButton",
+            type: "button",
+            disabled,
+            onClick: onTest,
+          },
+          state.kind === "testing" ? t("testing") : t("test"),
+        ),
       ),
     ),
-    message ? React.createElement("p", { className: messageClass, role: "status" }, message) : null,
     state.kind === "success" && state.results?.length
       ? React.createElement(
           "div",
@@ -496,7 +499,11 @@ function SearxngCard(props) {
         React.createElement("span", { className: "dshSearxngTitle" }, t("title")),
         React.createElement("span", { className: "dshSearxngDescription" }, t("description")),
       ),
-      React.createElement("span", { className: "dshSearxngChevron", "data-open": open ? "true" : "false", "aria-hidden": true }, "⌄"),
+      React.createElement(
+        "span",
+        { className: "dshSearxngChevron", "data-open": open ? "true" : "false", "aria-hidden": true },
+        React.createElement(IconChevronDownOutline14, { size: 14 }),
+      ),
     ),
     open
       ? React.createElement(

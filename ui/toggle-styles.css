@@ -75,8 +75,30 @@
   flex-direction: column;
 }
 
+.dshSearxngTestRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.dshSearxngTestRow .dshSearxngSuccess,
+.dshSearxngTestRow .dshSearxngError {
+  min-width: 0;
+  flex: 1;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dshSearxngTestPlaceholder {
+  flex: 1;
+}
+
 .dshSearxngTestActions {
   display: flex;
+  flex: none;
   justify-content: flex-end;
 }
 
