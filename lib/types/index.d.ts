@@ -14,13 +14,15 @@ export declare const name = "web-search-searxng";
 export declare const inject: string[];
 /** Plugin config (all optional — `apply` fills env-var and constant defaults). */
 export interface Config {
+    /** Whether searches use SearXNG instead of dsh's native provider. Defaults to false. */
+    enabled?: boolean;
     /** Literal SearXNG API key (optional for local instances). */
     apiKey?: string;
     /** Credential reference resolved for each search; defaults to `SEARXNG_API_KEY`. */
     apiKeyEnv?: string;
     /** SearXNG base URL. Defaults to `http://localhost:8080`. */
     baseURL?: string;
-    /** Upper bound on sources returned by one search. Defaults to 10. */
+    /** Upper bound on sources returned by one search. Defaults to 5. */
     maxResults?: number;
     /** Search language sent as `language=...`; 'all' omits the parameter. Defaults to 'all'. */
     language?: string;

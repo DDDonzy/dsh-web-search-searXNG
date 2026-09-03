@@ -8,12 +8,15 @@
 # YAML editing is required. The values below are fallbacks when unset.
 - id: web
   config:
-    searchProvider: searxng-local
+    # Keep dsh's native provider as the default. The SearXNG card's toggle
+    # changes this selection after the user explicitly enables and saves it.
+    searchProvider: deepseek-official
 
 - insert:
     - id: web-search-searxng
-      name: dsh-web-search-searxng
+      name: '@deepseek-ai/dsh-web-search-searxng'
       config:
+        enabled: false
         baseURL: !!js process.env.SEARXNG_BASE_URL ?? 'http://localhost:8080'
-        maxResults: !!js Number(process.env.SEARXNG_MAX_RESULTS ?? 10)
+        maxResults: !!js Number(process.env.SEARXNG_MAX_RESULTS ?? 5)
         language: !!js process.env.SEARXNG_LANGUAGE ?? 'all'

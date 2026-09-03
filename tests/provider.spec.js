@@ -107,7 +107,7 @@ describe("SearxngSearchProvider", () => {
 
   it("defaults match the documented constants", () => {
     assert.equal(SEARXNG_DEFAULT_BASE_URL, "http://localhost:8080");
-    assert.equal(SEARXNG_DEFAULT_MAX_RESULTS, 10);
+    assert.equal(SEARXNG_DEFAULT_MAX_RESULTS, 5);
   });
 
   it("sends q, format=json and count, and maps the response", async () => {

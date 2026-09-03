@@ -9,7 +9,7 @@ export declare const SEARXNG_PROVIDER_ID = "searxng-local";
 /** Default SearXNG endpoint (the local compose deployment). */
 export declare const SEARXNG_DEFAULT_BASE_URL = "http://localhost:8080";
 /** Default upper bound on sources returned by one search. */
-export declare const SEARXNG_DEFAULT_MAX_RESULTS = 10;
+export declare const SEARXNG_DEFAULT_MAX_RESULTS = 5;
 /** Options one search is served from (fully defaulted by the plugin). */
 export interface SearxngSearchProviderOptions {
     /** Literal API key when configured. */

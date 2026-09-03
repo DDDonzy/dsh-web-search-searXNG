@@ -17,12 +17,21 @@
       "types": "./lib/types/provider.d.ts",
       "default": "./lib/provider.js"
     },
+    "./client": {
+      "default": "./lib/client.js"
+    },
     "./cordis.patch.yml": "./cordis.patch.yml",
     "./package.json": "./package.json"
   },
   "files": [
+    "src/**/*.js",
+    "ui/**/*.js",
+    "ui/**/*.css",
+    "ui/**/*.md",
+    "scripts/**/*.mjs",
     "lib/index.js",
     "lib/provider.js",
+    "lib/client.js",
     "lib/types/**/*.d.ts",
     "cordis.patch.yml",
     "README.md",
@@ -30,6 +39,8 @@
     "LICENSE"
   ],
   "scripts": {
+    "build": "node scripts/build.mjs",
+    "build:client": "node scripts/build-client.mjs",
     "test": "node --test tests/provider.spec.js"
   },
   "keywords": [
@@ -43,7 +54,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/acdcgz/dsh-web-search-searxng.git"
+    "url": "git+https://github.com/DDDonzy/dsh-web-search-searXNG.git"
   },
   "license": "MIT",
   "peerDependencies": {
@@ -61,6 +72,15 @@
   "dsh": {
     "bundle": {
       "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-settings",
+        "@deepseek-ai/dsh-client-ui-settings-plugins",
+        "@deepseek-ai/dsh-api-remotes"
+      ],
+      "platform": "web"
     }
   }
 }

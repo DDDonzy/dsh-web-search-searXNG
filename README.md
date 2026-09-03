@@ -1,113 +1,109 @@
-# @deepseek-ai/dsh-web-search-searxng
+# dsh-web-search-searXNG
 
 English | [中文](README.zh.md)
 
-A [SearXNG](https://docs.searxng.org/)-backed `WebSearchProvider` for the DeepSeek Harness [web capability seam](https://github.com/deepseek-ai/deepseek-harness) (`ctx.web`). It calls a SearXNG instance's JSON API (`/search?format=json`) and maps the aggregated results into the seam's normalized `WebSearchResult`.
+> **Fork notice**: This project is forked from [acdcgz/dsh-web-search-searxng](https://github.com/acdcgz/dsh-web-search-searxng). The maintained repository is [DDDonzy/dsh-web-search-searXNG](https://github.com/DDDonzy/dsh-web-search-searXNG).
 
-This is an **implementation** package: it registers a provider into `ctx.web`, resolves an optional API key through `ctx.credentials` or the process environment, records the auxiliary request in the initiating Agent session when one exists, and does not register a model-facing tool. It is a function/namespace plugin (`inject: ['web']`).
+A [SearXNG](https://docs.searxng.org/)-backed `WebSearchProvider` for the DeepSeek Harness [web capability seam](https://github.com/deepseek-ai/deepseek-harness) (`ctx.web`). The plugin calls SearXNG's JSON API and maps aggregated results into dsh's normalized search-source shape.
 
-## Why SearXNG
+## Features
 
-- **Self-hosted & private**: your queries go to your own instance, not a third-party search vendor.
-- **Zero per-search model cost**: unlike provider-backed search that issues a full model call, one search is a single HTTP GET — cheap and fast.
-- **Multi-engine aggregation**: SearXNG merges Bing, Brave, Baidu, Google, DuckDuckGo, … behind one endpoint.
-- **Portable**: point `baseURL` at any SearXNG — local Docker, a LAN instance, or a public one.
+- Self-hosted SearXNG search without a per-search model request;
+- SearXNG multi-engine aggregation;
+- dsh provider ID: `searxng-local`;
+- SearXNG disabled by default, preserving dsh's native search;
+- Settings card for switching between native dsh search and SearXNG;
+- API Key stored through dsh Credentials without echoing the secret;
+- URL, result-count, and language controls;
+- Connection test with a preview of real search results;
+- Host logic and Browser UI kept separate, with UI source under `ui/`.
 
-## Requirements
+## Installation
 
-- A running SearXNG instance reachable from the DSH host (default `http://localhost:8080`).
-- DeepSeek Harness profile with the `web` seam mounted (every standard profile ships it).
+### Install from a local directory
 
-## Install
-
-### One-command install (bundle)
-
-The package ships a `dsh.bundle.patch` declaration (`cordis.patch.yml`), so a
-single `dsh plugin add` registers the plugin **and** switches the web seam to
-it — no YAML editing:
+Use this when the project is already available on the local machine:
 
 ```bash
-dsh plugin --profile web add /path/to/dsh-web-search-searxng
+dsh plugin --profile web add E:\dsh-searXNG
 ```
 
-Configuration is environment-first — set these before launching `dsh` and no
-config editing is required at all:
+Restart dsh after installation, then open:
+
+```text
+Settings → Plugins → Plugin configuration → SearXNG search
+```
+
+### Install from the Git repository
+
+Install directly from the maintained repository:
 
 ```bash
-export SEARXNG_BASE_URL=http://localhost:8080   # optional; default http://localhost:8080
-export SEARXNG_MAX_RESULTS=10                    # optional; default 10
-export SEARXNG_LANGUAGE=en                       # optional; 'all' (no param) by default
+dsh plugin --profile web add github:DDDonzy/dsh-web-search-searXNG
 ```
 
-### Manual install (local development)
+Alternatively, clone it first and install the local directory:
 
 ```bash
-# 1. Make the package resolvable from the profile's node_modules
-ln -sfn /path/to/dsh-web-search-searxng \
-        "$DSH_HOME/profiles/node_modules/@deepseek-ai/dsh-web-search-searxng"
-
-# 2. Register the plugin and switch the search provider in cordis.patch.yml:
+git clone https://github.com/DDDonzy/dsh-web-search-searXNG.git
+dsh plugin --profile web add .\dsh-web-search-searXNG
 ```
 
-```yaml
-- insert:
-    - id: web-search-searxng
-      name: '@deepseek-ai/dsh-web-search-searxng'
-      config:
-        baseURL: http://localhost:8080
-        maxResults: 10
+Restart dsh after installation. Web profiles do not hot-reload plugin changes by default.
 
-- id: web
-  config:
-    searchProvider: searxng-local
+## Settings UI
+
+The settings card is located at:
+
+```text
+Settings → Plugins → Plugin configuration → SearXNG search
 ```
 
-Restart the DSH process (or the GUI) for the patch to take effect.
+The card provides:
 
-> Web profiles disable HMR reload by design; after editing `cordis.patch.yml` a process restart is required.
+- an `Enable SearXNG` master switch, off by default;
+- native dsh search when off, and SearXNG after enabling and saving;
+- an `API Key` input that only exposes configured state;
+- a `SearXNG URL` input;
+- a `Test connection` button that requires the API Key;
+- a real search request and result preview;
+- green success and red failure messages;
+- automatic test-message expiry after 10 seconds;
+- `Maximum results`, defaulting to `5`;
+- `Search language`, defaulting to `all`;
+- save, discard, and reset actions.
 
-## Tests
+## Source layout
+
+```text
+src/
+  index.js       Host plugin entry and settings configuration
+  provider.js    SearXNG WebSearchProvider implementation
+
+ui/
+  client.js      dsh Browser UI slot and settings card
+  styles.css     Card and form styles
+  toggle-control.js
+  toggle-styles.css
+  test-control.js
+
+lib/
+  index.js       Host publish entrypoint
+  provider.js    Provider publish entrypoint
+  client.js      dsh lazy-CJS Browser bundle
+```
+
+The UI uses dsh's `settingsScope`, Credentials Remote, Snapshot Store, and `settings.plugin.item` keyed slot, together with dsh CSS design tokens for theme consistency.
+
+## Development and tests
 
 ```bash
-node --test tests/provider.spec.js   # 17 tests, zero dependencies (node:test)
+npm install
+npm run build
+npm test
 ```
 
-## Config
-
-| Key | Default | Meaning |
-|---|---|---|
-| `baseURL` | `http://localhost:8080` | SearXNG base URL; `/search` is appended. Falls back to `$SEARXNG_BASE_URL` from any environment layer. An unparseable value makes the provider unavailable. |
-| `maxResults` | `10` | Upper bound on sources returned by one search (the seam also enforces its own bound). |
-| `language` | `all` | Search language sent as `language=...` (e.g. `en`, `zh-CN`). `'all'` (or unset) omits the parameter entirely. Falls back to `$SEARXNG_LANGUAGE`. |
-| `apiKey` | omitted | Literal SearXNG API key, when your instance requires one. Prefer `apiKeyEnv` so no secret enters configuration; a non-empty literal wins. |
-| `apiKeyEnv` | `SEARXNG_API_KEY` | Credential reference resolved per search through `ctx.credentials`, or from the process environment when that seam is absent. A missing value is fine for keyless local instances. |
-
-```yaml
-- id: web-search-searxng
-  name: '@deepseek-ai/dsh-web-search-searxng'
-  config:
-    baseURL: http://localhost:8080
-    maxResults: 10
-    language: en
-```
-
-The entry above is the base layer of the `web-search-searxng` Settings section: a user layer over it reaches the NEXT search, because the provider projects the section per call rather than capturing it at registration. `apiKey` carries `role('secret')`, so it never rides a `describe()` response in any layer.
-
-## Rate-limit note (local Docker behind Docker Desktop)
-
-When SearXNG runs in Docker Desktop, requests from the host arrive with the compose **gateway IP** (e.g. `172.18.0.1`) as `REMOTE_ADDR`, not `127.0.0.1`. The SearXNG limiter would treat that as a foreign client and 429 the JSON API (`API_MAX = 4/hour`). This provider sends `X-Forwarded-For: 127.0.0.1` on every request; combined with `trusted_proxies = ['127.0.0.0/8']` and a `pass_ip` entry for the loopback and Docker bridge ranges in `limiter.toml`, the local client bypasses the JSON-API quota entirely.
-
-If your SearXNG is remote (LAN/cloud), drop that header from the provider or adjust `trusted_proxies`/`pass_ip` on the server accordingly.
-
-## Mapping
-
-SearXNG returns no provider-generated answer content this provider trusts as `content`, so `content` is omitted. `sources[]` comes from `results[]`: `url` ← `url`, `title` ← `title`, `snippet` ← `content`, and `publishedAt` ← `publishedDate`. Results are deduplicated by URL.
-
-Provider failures become `WEB_PROVIDER_ERROR`; caller cancellation becomes `WEB_ABORTED`. HTTP redirects are followed (SearXNG may 307 blob/redirect endpoints).
-
-## Request logging
-
-Immediately before dispatch, a search running under an initiating Agent appends the log-only `web/searxng-search-request` session event containing the resolved endpoint and query (secret-free). Direct programmatic provider calls outside an Agent have no initiating session to log.
+Tests cover result mapping, request parameters, authentication, errors, and cancellation.
 
 ## License
 

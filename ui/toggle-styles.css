@@ -1,0 +1,135 @@
+.dshSearxngToggleField {
+  padding: 12px 0;
+}
+
+.dshSearxngToggleLabel {
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  cursor: pointer;
+  display: flex;
+  min-height: 30px;
+}
+
+.dshSearxngToggleInput {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.dshSearxngToggleTrack {
+  width: 34px;
+  height: 20px;
+  padding: 2px;
+  box-sizing: border-box;
+  border-radius: 999px;
+  background: var(--dsw-alias-border-l4);
+  transition: background 0.16s;
+  flex: none;
+}
+
+.dshSearxngToggleThumb {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--dsw-alias-label-primary);
+  transition: transform 0.16s;
+}
+
+.dshSearxngToggleInput:checked ~ .dshSearxngToggleTrack {
+  background: var(--dsw-alias-brand-primary);
+}
+
+.dshSearxngToggleInput:checked ~ .dshSearxngToggleTrack .dshSearxngToggleThumb {
+  transform: translateX(14px);
+  background: var(--dsw-alias-bg-base, #ffffff);
+}
+
+.dshSearxngToggleInput:focus-visible ~ .dshSearxngToggleTrack {
+  outline: 2px solid var(--dsw-alias-brand-primary);
+  outline-offset: 2px;
+}
+
+.dshSearxngToggleInput:disabled ~ .dshSearxngToggleTrack,
+.dshSearxngToggleInput:disabled ~ .dshSearxngToggleText {
+  opacity: 0.55;
+}
+
+.dshSearxngToggleText {
+  color: var(--dsw-alias-label-primary);
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.dshSearxngToggleField > .dshSearxngHint {
+  white-space: pre-line;
+}
+
+.dshSearxngTest {
+  gap: 8px;
+  padding: 0 0 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.dshSearxngTestActions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.dshSearxngSuccess {
+  color: var(--dsw-alias-state-business-success, #36a269);
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.dshSearxngResults {
+  border: 0.5px solid var(--dsw-alias-border-l2);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.dshSearxngResultsTitle {
+  color: var(--dsw-alias-label-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.dshSearxngResultsList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dshSearxngResult {
+  min-width: 0;
+}
+
+.dshSearxngResult a {
+  color: var(--dsw-alias-label-primary);
+  font-size: 12px;
+  line-height: 1.5;
+  text-decoration: none;
+}
+
+.dshSearxngResult a:hover {
+  text-decoration: underline;
+}
+
+.dshSearxngResult p {
+  color: var(--dsw-alias-label-tertiary);
+  margin: 2px 0 0;
+  overflow: hidden;
+  font-size: 11px;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
